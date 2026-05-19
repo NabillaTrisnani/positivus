@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id   Int    @id @default(autoincrement())
+  name String
+  email String @unique
+}
+
+model Partner {
+  id          Int    @id @default(autoincrement())
+  image       String
+}
+
+model Service {
+  id          Int    @id @default(autoincrement())
+  name        String
+  image       String
+}
+
+model CaseStudy {
+  id          Int    @id @default(autoincrement())
+  text        String
+}
+
+model WorkingProcess {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+}
+
+model Team {
+  id          Int    @id @default(autoincrement())
+  name        String
+  position    String
+  description String
+  photo       String
+  linkedin    String
+}
+
+model Testimonial {
+  id        Int    @id @default(autoincrement())
+  name      String
+  position  String
+  testimony String
+}
+
+model Contanct {
+  id        Int    @id @default(autoincrement())
+  name      String
+  email     String
+  message   String
+  type      String
+}
+
+model Subription {
+  id        Int    @id @default(autoincrement())
+  email     String
+}
+
+model SocialMedia {
+  id        Int    @id @default(autoincrement())
+  link      String
+  platform  String
+}
