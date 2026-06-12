@@ -1,26 +1,88 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--background: #ffffff;
+	--foreground: #171717;
+
+	--green: #b9ff66;
+	--green-hover: #b9ff667a;
+	--black: #191a23;
+	--gray: #f3f3f3;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	--color-green: var(--green);
+	--color-green-hover: var(--green-hover);
+	--color-black: var(--black);
+	--color-gray: var(--gray);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: "Space Grotesk", sans-serif;
+}
+
+@keyframes toast-in {
+	from {
+		opacity: 0;
+		transform: translateX(120%);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes toast-out {
+	from {
+		opacity: 1;
+		transform: translateX(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateX(120%);
+	}
+}
+
+.animate-toast-in {
+	animation: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-toast-out {
+	animation: toast-out 0.25s ease-in both;
+}
+
+@keyframes modal-overlay-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes modal-panel-in {
+	from {
+		opacity: 0;
+		transform: translateY(12px) scale(0.97);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.animate-modal-overlay-in {
+	animation: modal-overlay-in 0.2s ease-out both;
+}
+
+.animate-modal-panel-in {
+	animation: modal-panel-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
