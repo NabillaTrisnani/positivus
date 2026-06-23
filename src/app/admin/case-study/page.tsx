@@ -1,0 +1,270 @@
+"use client";
+
+import { useCallback, useRef, useState } from "react";
+import Button from "@/components/button";
+import MainLayoutAdmin from "@/components/mainLayoutAdmin";
+import Modal from "@/components/modal";
+import { CirclePlus } from "lucide-react";
+import Textarea from "@/components/textarea";
+import DataTable, { Column, DataTableQuery } from "@/components/datatable";
+import { initialMeta, type PaginationMeta } from "@/lib/pagination";
+
+type CaseStudyRow = {
+    id: number;
+    text: string;
+};
+
+const columns: Column<CaseStudyRow>[] = [
+    { header: "text", accessor: "text" },
+];
+
+export default function CaseStudy() {
+    // Modal states
+    const [openAdd, setOpenAdd] = useState<boolean>(false);
+    const [openEdit, setOpenEdit] = useState<boolean>(false);
+    const [openDelete, setOpenDelete] = useState<boolean>(false);
+    const [text, setText] = useState<string>("");
+    const [id, setId] = useState<number | null>(null);
+
+    // DataTable states
+    const [rows, setRows] = useState<CaseStudyRow[]>([]);
+    const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
+    const [loading, setLoading] = useState<boolean>(false);
+    const lastQuery = useRef<DataTableQuery>({ page: 1, limit: 10, search: "" });
+
+    //get data
+    const fetchData = useCallback(async (query: DataTableQuery) => {
+        lastQuery.current = query;
+        setLoading(true);
+
+        try {
+            const params = new URLSearchParams({
+                page: String(query.page),
+                limit: String(query.limit),
+                search: query.search,
+            });
+
+            const res = await fetch(`/api/case-study?${params.toString()}`);
+
+            if (!res.ok) {
+                throw new Error("Failed to fetch data");
+            }
+
+            const json: { data: CaseStudyRow[]; meta: PaginationMeta } = await res.json();
+
+            const CaseStudyData: CaseStudyRow[] = json.data.map((item) => ({
+                id: item.id,
+                text: <p className="line-clamp-2">{item.text}</p>,
+            }));
+
+            setRows(CaseStudyData);
+            setMeta(json.meta);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    //get one data
+    const fetchOneData = useCallback(async (id: number) => {
+        setLoading(true);
+
+        try {
+
+            const res = await fetch(`/api/case-study/${id}`);
+
+            if (!res.ok) {
+                throw new Error("Failed to fetch data");
+            }
+
+            const json = await res.json();
+
+            setText(json.data.text);
+            setId(json.data.id);
+
+            setOpenEdit(true);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    //add data
+    const addData = useCallback(async () => {
+        setLoading(true);
+
+        try {
+
+            const res = await fetch(`/api/case-study`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    text: text,
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to create data");
+            }
+
+            setText("");
+            setId(null);
+
+            fetchData(lastQuery.current);
+
+            setOpenAdd(false);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }, [text, fetchData]);
+
+    //edit data
+    const editData = useCallback(async () => {
+        if (id === null) return;
+
+        setLoading(true);
+
+        try {
+
+            const res = await fetch(`/api/case-study/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    text: text,
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to update data");
+            }
+
+            setText("");
+            setId(null);
+
+            fetchData(lastQuery.current);
+
+            setOpenEdit(false);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }, [id, text, fetchData]);
+
+    //delete data
+    const deleteData = useCallback(async () => {
+        if (id === null) return;
+
+        setLoading(true);
+
+        try {
+
+            const res = await fetch(`/api/case-study/${id}`, {
+                method: "DELETE",
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to delete data");
+            }
+
+            fetchData(lastQuery.current);
+
+            setOpenDelete(false);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }, [id, fetchData]);
+
+    return (
+        <MainLayoutAdmin>
+            <div className="flex justify-between items-center mb-10">
+                <h1 className="text-2xl font-semibold">Case Study</h1>
+                <Button className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1" onClick={() => setOpenAdd(true)}>
+                    <CirclePlus size={16} />
+                    Add Case Study
+                </Button>
+            </div>
+
+            <DataTable
+                columns={columns}
+                data={rows}
+                meta={meta}
+                loading={loading}
+                onQueryChange={fetchData}
+                getRowId={(row) => row.id}
+                onEdit={(row) => fetchOneData(row.id)}
+                onDelete={(row) => {
+                    setId(row.id);
+                    setOpenDelete(true);
+                }}
+            />
+
+            {/* Modal Add */}
+            <Modal
+                isOpen={openAdd}
+                onClose={() => setOpenAdd(false)}
+                title="Add Case Study"
+                footer={
+                    <>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)}>
+                            Cancel
+                        </Button>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={addData}>
+                            Add Case
+                        </Button>
+                    </>
+                }
+            >
+                <Textarea label="Text" className="bg-white" value={text} onChange={setText} />
+            </Modal>
+
+            {/* Modal Edit */}
+            <Modal
+                isOpen={openEdit}
+                onClose={() => setOpenEdit(false)}
+                title="Edit Case Study"
+                footer={
+                    <>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)}>
+                            Cancel
+                        </Button>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={editData}>
+                            Update Case
+                        </Button>
+                    </>
+                }
+            >
+                <Textarea label="text" className="bg-white" value={text} onChange={setText} />
+            </Modal>
+
+            {/* Modal Delete */}
+            <Modal
+                isOpen={openDelete}
+                onClose={() => setOpenDelete(false)}
+                title="Delete Case Study"
+                footer={
+                    <>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)}>
+                            Cancel
+                        </Button>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData}>
+                            Delete Case
+                        </Button>
+                    </>
+                }
+            >
+                <p>Are you sure you want to delete this case?</p>
+            </Modal>
+        </MainLayoutAdmin>
+    )
+}
