@@ -12,6 +12,15 @@
  *   return NextResponse.json({ success: true, ...result });
  */
 
+export const initialMeta: PaginationMeta = {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+};
+
 export type PaginationParams = {
     page: number;
     limit: number;

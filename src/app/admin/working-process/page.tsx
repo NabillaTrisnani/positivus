@@ -8,7 +8,7 @@ import { CirclePlus } from "lucide-react";
 import Input from "@/components/input";
 import Textarea from "@/components/textarea";
 import DataTable, { Column, DataTableQuery } from "@/components/datatable";
-import type { PaginationMeta } from "@/lib/pagination";
+import { initialMeta, type PaginationMeta } from "@/lib/pagination";
 
 type WorkingProcessRow = {
     id: number;
@@ -20,15 +20,6 @@ const columns: Column<WorkingProcessRow>[] = [
     { header: "Title", accessor: "title" },
     { header: "Description", accessor: "description" },
 ];
-
-const initialMeta: PaginationMeta = {
-    page: 1,
-    limit: 10,
-    total: 0,
-    totalPages: 0,
-    hasNextPage: false,
-    hasPreviousPage: false,
-};
 
 export default function WorkingProcess() {
     // Modal states
