@@ -6,12 +6,14 @@ export default function Textarea({
     onChange = () => { },
     label = "",
     rows = 4,
+    disabled = false,
 }: {
     className?: string;
     value?: string;
     onChange?: (value: string) => void;
     label?: string;
     rows?: number;
+    disabled?: boolean;
 }) {
     return (
         <div>
@@ -24,6 +26,7 @@ export default function Textarea({
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     rows={rows}
+                    disabled={disabled}
                 >
                     {value}
                 </textarea>

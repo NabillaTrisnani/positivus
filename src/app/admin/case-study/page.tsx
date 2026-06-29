@@ -13,8 +13,12 @@ type CaseStudyRow = {
     id: number;
     text: string;
 };
+type CaseStudyDisplay = {
+    id: number;
+    text: React.ReactNode;
+};
 
-const columns: Column<CaseStudyRow>[] = [
+const columns: Column<CaseStudyDisplay>[] = [
     { header: "text", accessor: "text" },
 ];
 
@@ -27,7 +31,7 @@ export default function CaseStudy() {
     const [id, setId] = useState<number | null>(null);
 
     // DataTable states
-    const [rows, setRows] = useState<CaseStudyRow[]>([]);
+    const [rows, setRows] = useState<CaseStudyDisplay[]>([]);
     const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
     const [loading, setLoading] = useState<boolean>(false);
     const lastQuery = useRef<DataTableQuery>({ page: 1, limit: 10, search: "" });
@@ -52,7 +56,7 @@ export default function CaseStudy() {
 
             const json: { data: CaseStudyRow[]; meta: PaginationMeta } = await res.json();
 
-            const CaseStudyData: CaseStudyRow[] = json.data.map((item) => ({
+            const CaseStudyData: CaseStudyDisplay[] = json.data.map((item) => ({
                 id: item.id,
                 text: <p className="line-clamp-2">{item.text}</p>,
             }));
@@ -216,16 +220,16 @@ export default function CaseStudy() {
                 title="Add Case Study"
                 footer={
                     <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)}>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)} disabled={loading}>
                             Cancel
                         </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={addData}>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
                             Add Case
                         </Button>
                     </>
                 }
             >
-                <Textarea label="Text" className="bg-white" value={text} onChange={setText} />
+                <Textarea label="Text" className="bg-white" value={text} onChange={setText} disabled={loading} />
             </Modal>
 
             {/* Modal Edit */}
@@ -235,16 +239,16 @@ export default function CaseStudy() {
                 title="Edit Case Study"
                 footer={
                     <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)}>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)} disabled={loading}>
                             Cancel
                         </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={editData}>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
                             Update Case
                         </Button>
                     </>
                 }
             >
-                <Textarea label="text" className="bg-white" value={text} onChange={setText} />
+                <Textarea label="text" className="bg-white" value={text} onChange={setText} disabled={loading} />
             </Modal>
 
             {/* Modal Delete */}
@@ -254,10 +258,10 @@ export default function CaseStudy() {
                 title="Delete Case Study"
                 footer={
                     <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)}>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
                             Cancel
                         </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData}>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
                             Delete Case
                         </Button>
                     </>

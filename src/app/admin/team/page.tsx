@@ -253,20 +253,20 @@ export default function Team() {
                 title="Add Team"
                 footer={
                     <>
-                        <Button className="border border-black px-5 py-2" onClick={() => { setOpenAdd(false); resetForm(); }}>
+                        <Button className="border border-black px-5 py-2" onClick={() => { setOpenAdd(false); resetForm(); }} disabled={loading}>
                             Cancel
                         </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={addData}>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
                             Add Team
                         </Button>
                     </>
                 }
             >
-                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} />
-                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} />
-                <Input label="LinkedIn Link" type="text" className="bg-white mb-4" value={linkedin} onChange={setLinkedin} />
-                <Textarea label="Description" className="bg-white mb-4" value={description} onChange={setDescription} />
-                <ImageInput label="Photo" onChange={setPhoto} />
+                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
+                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
+                <Input label="LinkedIn Link" type="text" className="bg-white mb-4" value={linkedin} onChange={setLinkedin} disabled={loading} />
+                <Textarea label="Description" className="bg-white mb-4" value={description} onChange={setDescription} disabled={loading} />
+                <ImageInput label="Photo" onChange={setPhoto} disabled={loading} />
             </Modal>
 
             {/* Modal Edit */}
@@ -276,19 +276,19 @@ export default function Team() {
                 title="Edit Team"
                 footer={
                     <>
-                        <Button className="border border-black px-5 py-2" onClick={() => { setOpenEdit(false); resetForm(); }}>
+                        <Button className="border border-black px-5 py-2" onClick={() => { setOpenEdit(false); resetForm(); }} disabled={loading}>
                             Cancel
                         </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={editData}>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
                             Update Team
                         </Button>
                     </>
                 }
             >
-                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} />
-                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} />
-                <Input label="LinkedIn Link" type="text" className="bg-white mb-4" value={linkedin} onChange={setLinkedin} />
-                <Textarea label="Description" className="bg-white mb-4" value={description} onChange={setDescription} />
+                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
+                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
+                <Input label="LinkedIn Link" type="text" className="bg-white mb-4" value={linkedin} onChange={setLinkedin} disabled={loading} />
+                <Textarea label="Description" className="bg-white mb-4" value={description} onChange={setDescription} disabled={loading} />
 
                 {/* Tampilkan foto lama kalau belum diganti */}
                 {existingPhoto && !photo && (
@@ -301,7 +301,7 @@ export default function Team() {
                         />
                     </div>
                 )}
-                <ImageInput label="Change Photo (optional)" onChange={setPhoto} />
+                <ImageInput label="Change Photo (optional)" onChange={setPhoto} disabled={loading} />
             </Modal>
 
             {/* Modal Delete */}
@@ -311,10 +311,10 @@ export default function Team() {
                 title="Delete Team"
                 footer={
                     <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)}>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
                             Cancel
                         </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData}>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
                             Delete Team
                         </Button>
                     </>

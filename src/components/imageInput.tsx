@@ -8,15 +8,17 @@ type ImageInputProps =
         onChange: (files: File[]) => void;
         label?: string;
         className?: string;
+        disabled?: boolean;
     }
     | {
         multiple?: false;
         onChange: (file: File | null) => void;
         label?: string;
         className?: string;
+        disabled?: boolean;
     };
 
-export default function ImageInput({ multiple, onChange, label, className }: ImageInputProps) {
+export default function ImageInput({ multiple, onChange, label, className, disabled = false }: ImageInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [previews, setPreviews] = useState<string[]>([]);
 
@@ -53,15 +55,16 @@ export default function ImageInput({ multiple, onChange, label, className }: Ima
                 <label className="block text-sm font-medium mb-1">{label}</label>
             )}
 
-            <div
-                className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition"
-                onClick={() => inputRef.current?.click()}
+            <button
+                className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition disabled:cursor-not-allowed disabled:border-gray-300 disabled:hover:border-gray-300"
+                onClick={() => (disabled ? null : inputRef.current?.click())}
+                disabled={disabled}
             >
                 <p className="text-sm text-gray-500">
                     Click to upload {multiple ? "images" : "an image"}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">JPG, PNG, WEBP</p>
-            </div>
+            </button>
 
             <input
                 ref={inputRef}
@@ -70,6 +73,7 @@ export default function ImageInput({ multiple, onChange, label, className }: Ima
                 multiple={multiple}
                 className="hidden"
                 onChange={handleChange}
+                disabled={disabled}
             />
 
             {/* Preview */}
@@ -88,6 +92,7 @@ export default function ImageInput({ multiple, onChange, label, className }: Ima
                                     e.stopPropagation();
                                     handleRemove(i);
                                 }}
+                                disabled={disabled}
                                 className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center"
                             >
                                 ×

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import Button from "@/components/button";
 import MainLayoutAdmin from "@/components/mainLayoutAdmin";
 import Modal from "@/components/modal";
@@ -15,8 +15,13 @@ type WorkingProcessRow = {
     title: string;
     description: string;
 };
+type WorkingProcessDisplay = {
+    id: number;
+    title: React.ReactNode;
+    description: React.ReactNode;
+};
 
-const columns: Column<WorkingProcessRow>[] = [
+const columns: Column<WorkingProcessDisplay>[] = [
     { header: "Title", accessor: "title" },
     { header: "Description", accessor: "description" },
 ];
@@ -31,7 +36,7 @@ export default function WorkingProcess() {
     const [id, setId] = useState<number | null>(null);
 
     // DataTable states
-    const [rows, setRows] = useState<WorkingProcessRow[]>([]);
+    const [rows, setRows] = useState<WorkingProcessDisplay[]>([]);
     const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
     const [loading, setLoading] = useState<boolean>(false);
     const lastQuery = useRef<DataTableQuery>({ page: 1, limit: 10, search: "" });
@@ -56,7 +61,7 @@ export default function WorkingProcess() {
 
             const json: { data: WorkingProcessRow[]; meta: PaginationMeta } = await res.json();
 
-            const workingProcessesData: WorkingProcessRow[] = json.data.map((item) => ({
+            const workingProcessesData: WorkingProcessDisplay[] = json.data.map((item) => ({
                 id: item.id,
                 title: <p className="line-clamp-2">{item.title}</p>,
                 description: <p className="line-clamp-2">{item.description}</p>,
@@ -226,17 +231,17 @@ export default function WorkingProcess() {
                 title="Add Working Process"
                 footer={
                     <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)}>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)} disabled={loading}>
                             Cancel
                         </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={addData}>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
                             Add Process
                         </Button>
                     </>
                 }
             >
-                <Input label="Title" type="text" className="bg-white mb-4" value={title} onChange={setTitle} />
-                <Textarea label="Description" className="bg-white" value={description} onChange={setDescription} />
+                <Input label="Title" type="text" className="bg-white mb-4" value={title} onChange={setTitle} disabled={loading} />
+                <Textarea label="Description" className="bg-white" value={description} onChange={setDescription} disabled={loading} />
             </Modal>
 
             {/* Modal Edit */}
@@ -246,17 +251,17 @@ export default function WorkingProcess() {
                 title="Edit Working Process"
                 footer={
                     <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)}>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)} disabled={loading}>
                             Cancel
                         </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={editData}>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
                             Update Process
                         </Button>
                     </>
                 }
             >
-                <Input label="Title" type="text" className="bg-white mb-4" value={title} onChange={setTitle} />
-                <Textarea label="Description" className="bg-white" value={description} onChange={setDescription} />
+                <Input label="Title" type="text" className="bg-white mb-4" value={title} onChange={setTitle} disabled={loading} />
+                <Textarea label="Description" className="bg-white" value={description} onChange={setDescription} disabled={loading} />
             </Modal>
 
             {/* Modal Delete */}
@@ -266,10 +271,10 @@ export default function WorkingProcess() {
                 title="Delete Working Process"
                 footer={
                     <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)}>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
                             Cancel
                         </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData}>
+                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
                             Delete Process
                         </Button>
                     </>

@@ -11,6 +11,7 @@ export default function Input({
     isPassword = false,
     togglePassword = () => { },
     isSearch = false,
+    disabled = false,
 }: {
     className?: string;
     value?: string;
@@ -20,6 +21,7 @@ export default function Input({
     isPassword?: boolean;
     togglePassword?: () => void;
     isSearch?: boolean;
+    disabled?: boolean;
 }) {
     return (
         <div>
@@ -63,6 +65,7 @@ export default function Input({
                         className={`border border-solid border-black rounded-[14px] py-2 px-4 text-base w-full outline-none ${className}`}
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
+                        disabled={disabled}
                     />
                 )
             }

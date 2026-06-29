@@ -260,10 +260,10 @@ export default function Testimonial() {
                     </>
                 }
             >
-                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} />
-                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} />
-                <Input label="Company" type="text" className="bg-white mb-4" value={company} onChange={setCompany} />
-                <Textarea label="Testimony" className="bg-white" value={testimony} onChange={setTestimony} />
+                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
+                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
+                <Input label="Company" type="text" className="bg-white mb-4" value={company} onChange={setCompany} disabled={loading} />
+                <Textarea label="Testimony" className="bg-white" value={testimony} onChange={setTestimony} disabled={loading} />
             </Modal>
 
             {/* Modal Edit */}
@@ -282,10 +282,10 @@ export default function Testimonial() {
                     </>
                 }
             >
-                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} />
-                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} />
-                <Input label="Company" type="text" className="bg-white mb-4" value={company} onChange={setCompany} />
-                <Textarea label="Testimony" className="bg-white" value={testimony} onChange={setTestimony} />
+                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
+                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
+                <Input label="Company" type="text" className="bg-white mb-4" value={company} onChange={setCompany} disabled={loading} />
+                <Textarea label="Testimony" className="bg-white" value={testimony} onChange={setTestimony} disabled={loading} />
             </Modal>
 
             {/* Modal Delete */}
