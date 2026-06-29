@@ -48,6 +48,7 @@ model Testimonial {
   id        Int    @id @default(autoincrement())
   name      String
   position  String
+  company   String?
   testimony String
 }
 
