@@ -60,7 +60,7 @@ model Contact {
   type      String
 }
 
-model Subription {
+model Subscription {
   id        Int    @id @default(autoincrement())
   email     String
 }
