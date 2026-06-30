@@ -36,47 +36,11 @@ export async function GET(
             data: contact,
         });
     } catch (error) {
+        console.error("Failed to get contact:", error);
         return NextResponse.json(
             {
                 success: false,
                 message: "Failed to fetch contact",
-            },
-            { status: 500 }
-        );
-    }
-}
-
-// UPDATE CONTACT
-export async function PUT(
-    req: Request,
-    { params }: Params
-) {
-    try {
-        const { id } = await params;
-
-        const body = await req.json();
-
-        const { name, email } = body;
-
-        const updatedContact = await prisma.contact.update({
-            where: {
-                id: Number(id),
-            },
-            data: {
-                name,
-                email,
-            },
-        });
-
-        return NextResponse.json({
-            success: true,
-            data: updatedContact,
-        });
-    } catch (error) {
-        return NextResponse.json(
-            {
-                success: false,
-                message: "Failed to update contact",
             },
             { status: 500 }
         );
@@ -102,6 +66,7 @@ export async function DELETE(
             message: "Contact deleted",
         });
     } catch (error) {
+        console.error("Failed to delete contact:", error);
         return NextResponse.json(
             {
                 success: false,
