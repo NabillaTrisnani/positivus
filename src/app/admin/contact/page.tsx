@@ -60,7 +60,7 @@ export default function Contact() {
 
             const json: { data: ContantRow[]; meta: PaginationMeta } = await res.json();
 
-            const testimonialsData: ContactDisplay[] = json.data.map((item) => ({
+            const contactData: ContactDisplay[] = json.data.map((item) => ({
                 id: item.id,
                 name: <p className="line-clamp-2">{item.name}</p>,
                 email: <p className="line-clamp-2">{item.email}</p>,
@@ -68,7 +68,7 @@ export default function Contact() {
                 type: <p className="line-clamp-2">{item.type}</p>,
             }));
 
-            setRows(testimonialsData);
+            setRows(contactData);
             setMeta(json.meta);
         } catch (error) {
             console.error(error);
