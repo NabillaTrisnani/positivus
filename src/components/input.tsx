@@ -62,7 +62,7 @@ export default function Input({
                 ) : (
                     <input
                         type={type}
-                        className={`border border-solid border-black rounded-[14px] py-2 px-4 text-base w-full outline-none ${className}`}
+                        className={`border border-solid border-black rounded-[14px] py-2 px-4 text-base w-full outline-none ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${className}`}
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
                         disabled={disabled}

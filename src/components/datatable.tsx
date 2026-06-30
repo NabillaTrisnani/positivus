@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Loader2, PencilLine, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, Loader2, PencilLine, Trash2 } from "lucide-react";
 import Button from "./button";
 import Input from "./input";
 import { useEffect, useState } from "react";
@@ -41,6 +41,7 @@ type DataTableProps<T> = {
     /** Unique id per row, used as the React key. Defaults to the array index. */
     getRowId?: (row: T, index: number) => string | number;
     onEdit?: (row: T) => void;
+    onPreview?: (row: T) => void;
     onDelete?: (row: T) => void;
     /** Show the search box. Default true. */
     searchable?: boolean;
@@ -63,6 +64,7 @@ export default function DataTable<T>({
     loading = false,
     getRowId,
     onEdit,
+    onPreview,
     onDelete,
     searchable = true,
     pageSizeOptions = [10, 25, 50, 100],
@@ -74,7 +76,7 @@ export default function DataTable<T>({
     const [pageSize, setPageSize] = useState<number>(pageSizeOptions[0] ?? 10);
     const [currentPage, setCurrentPage] = useState<number>(1);
 
-    const hasActions = Boolean(onEdit || onDelete);
+    const hasActions = Boolean(onEdit || onPreview || onDelete);
     const columnCount = columns.length + (hasActions ? 1 : 0);
 
     // Debounce the search input so we fire one request per typing burst.
@@ -176,6 +178,11 @@ export default function DataTable<T>({
                                                 {onEdit && (
                                                     <Button className="border border-black p-2 bg-yellow-400 hover:bg-yellow-300" onClick={() => onEdit(row)}>
                                                         <PencilLine size={16} />
+                                                    </Button>
+                                                )}
+                                                {onPreview && (
+                                                    <Button className="border border-black p-2 bg-green hover:bg-green-hover" onClick={() => onPreview(row)}>
+                                                        <Eye size={16} />
                                                     </Button>
                                                 )}
                                                 {onDelete && (

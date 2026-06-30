@@ -6,6 +6,9 @@ import MainLayoutAdmin from "@/components/mainLayoutAdmin";
 import Modal from "@/components/modal";
 import DataTable, { Column, DataTableQuery } from "@/components/datatable";
 import { initialMeta, type PaginationMeta } from "@/lib/pagination";
+import Input from "@/components/input";
+import Textarea from "@/components/textarea";
+import Radio from "@/components/radio";
 
 type ContantRow = {
     id: number;
@@ -29,8 +32,18 @@ const columns: Column<ContactDisplay>[] = [
     { header: "Type", accessor: "type" },
 ];
 
+const typesOptions = [
+    { label: "Say Hi", value: "say hi" },
+    { label: "Get a Quote", value: "quote" },
+]
+
 export default function Contact() {
     // Modal states
+    const [openPreview, setOpenPreview] = useState<boolean>(false);
+    const [name, setName] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [message, setMessage] = useState<string>("");
+    const [type, setType] = useState<string>("");
     const [openDelete, setOpenDelete] = useState<boolean>(false);
     const [id, setId] = useState<number | null>(null);
 
@@ -77,6 +90,34 @@ export default function Contact() {
         }
     }, []);
 
+    //get one data
+    const fetchOneData = useCallback(async (id: number) => {
+        setLoading(true);
+
+        try {
+
+            const res = await fetch(`/api/contact/${id}`);
+
+            if (!res.ok) {
+                throw new Error("Failed to fetch data");
+            }
+
+            const json = await res.json();
+
+            setName(json.data.name);
+            setEmail(json.data.email);
+            setMessage(json.data.message);
+            setType(json.data.type);
+            setId(json.data.id);
+
+            setOpenPreview(true);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     //delete data
     const deleteData = useCallback(async () => {
         if (id === null) return;
@@ -116,11 +157,33 @@ export default function Contact() {
                 loading={loading}
                 onQueryChange={fetchData}
                 getRowId={(row) => row.id}
+                onPreview={(row) => fetchOneData(row.id)}
                 onDelete={(row) => {
                     setId(row.id);
                     setOpenDelete(true);
                 }}
             />
+
+            {/* Modal Preview */}
+            <Modal
+                isOpen={openPreview}
+                onClose={() => setOpenPreview(false)}
+                title="Preview Message"
+                footer={
+                    <>
+                        <Button className="border border-black px-5 py-2" onClick={() => setOpenPreview(false)}>
+                            Close
+                        </Button>
+                    </>
+                }
+            >
+                <div className="mb-4">
+                    <Radio label="Type" options={typesOptions} value={type} onChange={setType} disabled={true} />
+                </div>
+                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={true} />
+                <Input label="Email" type="text" className="bg-white mb-4" value={email} onChange={setEmail} disabled={true} />
+                <Textarea label="Message" className="bg-white" value={message} onChange={setMessage} disabled={true} />
+            </Modal>
 
             {/* Modal Delete */}
             <Modal

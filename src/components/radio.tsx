@@ -28,7 +28,7 @@ export default function Radio({
                 {options.map((opt) => (
                     <label
                         key={opt.value}
-                        className={`flex items-center gap-2 text-sm text-black ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                        className={`flex items-center gap-2 text-sm text-black ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
                     >
                         {/* hidden native radio */}
                         <input
