@@ -77,28 +77,6 @@ export default function Contact() {
         }
     }, []);
 
-    //get one data
-    const fetchOneData = useCallback(async (id: number) => {
-        setLoading(true);
-
-        try {
-
-            const res = await fetch(`/api/contact/${id}`);
-
-            if (!res.ok) {
-                throw new Error("Failed to fetch data");
-            }
-
-            const json = await res.json();
-
-            setId(json.data.id);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
     //delete data
     const deleteData = useCallback(async () => {
         if (id === null) return;
