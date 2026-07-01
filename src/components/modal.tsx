@@ -20,6 +20,7 @@ type ModalProps = {
     hideCloseButton?: boolean;
     /** Allow closing by clicking the backdrop. Default: true */
     closeOnBackdrop?: boolean;
+    fullScreen?: boolean;
 };
 
 export default function Modal({
@@ -31,6 +32,7 @@ export default function Modal({
     className = "",
     hideCloseButton = false,
     closeOnBackdrop = true,
+    fullScreen = false,
 }: ModalProps) {
     // Close on Escape and lock body scroll while the modal is open.
     useEffect(() => {
@@ -63,7 +65,7 @@ export default function Modal({
             <div
                 onClick={(e) => e.stopPropagation()}
                 className={`
-                    relative w-full max-w-lg max-h-[90vh] flex flex-col
+                    relative w-full ${fullScreen ? "max-x-full" : "max-w-lg"} max-h-[90vh] flex flex-col
                     bg-white border border-solid border-black rounded-3xl
                     shadow-[0px_5px_0px_0px_#191A23]
                     animate-modal-panel-in

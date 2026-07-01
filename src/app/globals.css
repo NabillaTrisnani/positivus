@@ -28,6 +28,9 @@ body {
 	color: var(--foreground);
 	font-family: "Space Grotesk", sans-serif;
 }
+.text-gray {
+	color: var(--gray);
+}
 
 @keyframes toast-in {
 	from {

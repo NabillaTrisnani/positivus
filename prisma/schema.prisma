@@ -19,9 +19,14 @@ model Partner {
 }
 
 model Service {
-  id          Int    @id @default(autoincrement())
-  name        String
-  image       String
+  id                    Int    @id @default(autoincrement())
+  cardBackground        String
+  headerText            String
+  headerTextColor       String
+  headerBackgroundColor String
+  buttonIconColor       String
+  buttonFontColor       String
+  serviceIllustration   String
 }
 
 model CaseStudy {
