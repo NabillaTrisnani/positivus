@@ -94,7 +94,7 @@ export async function PUT(req: Request, { params }: Params) {
                 (resolve, reject) => {
                     cloudinary.uploader
                         .upload_stream(
-                            { folder: "partner-photos" },
+                            { folder: "partner-logo" },
                             (error, result) => {
                                 if (error || !result) reject(error);
                                 else resolve(result);

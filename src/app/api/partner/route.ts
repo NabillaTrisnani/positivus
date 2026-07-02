@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
             (resolve, reject) => {
                 cloudinary.uploader
                     .upload_stream(
-                        { folder: "partner-illustrations" },
+                        { folder: "partner-logo" },
                         (error, result) => {
                             if (error || !result) reject(error);
                             else resolve(result);
