@@ -13,11 +13,6 @@ model User {
   email String @unique
 }
 
-model Partner {
-  id          Int    @id @default(autoincrement())
-  image       String
-}
-
 model Service {
   id                    Int    @id @default(autoincrement())
   cardBackground        String
@@ -74,4 +69,10 @@ model SocialMedia {
   id        Int    @id @default(autoincrement())
   link      String
   platform  String
+}
+
+model Partner {
+  id          Int    @id @default(autoincrement())
+  name        String
+  logo        String
 }
