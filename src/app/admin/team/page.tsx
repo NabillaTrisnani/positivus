@@ -10,6 +10,7 @@ import Textarea from "@/components/textarea";
 import ImageInput from "@/components/imageInput";
 import DataTable, { Column, DataTableQuery } from "@/components/datatable";
 import { initialMeta, type PaginationMeta } from "@/lib/pagination";
+import Toast from "@/components/toast";
 
 type TeamRow = {
     id: number;
@@ -47,8 +48,8 @@ export default function Team() {
     const [name, setName] = useState<string>("");
     const [position, setPosition] = useState<string>("");
     const [description, setDescription] = useState<string>("");
-    const [photo, setPhoto] = useState<File | null>(null);       // ✅ File, bukan string
-    const [existingPhoto, setExistingPhoto] = useState<string>(""); // URL foto lama (untuk edit)
+    const [photo, setPhoto] = useState<File | null>(null);
+    const [existingPhoto, setExistingPhoto] = useState<string>("");
     const [linkedin, setLinkedin] = useState<string>("");
     const [id, setId] = useState<number | null>(null);
 
@@ -57,6 +58,11 @@ export default function Team() {
     const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
     const [loading, setLoading] = useState<boolean>(false);
     const lastQuery = useRef<DataTableQuery>({ page: 1, limit: 10, search: "" });
+
+    // Toast states
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState<"success" | "error">("error");
 
     function resetForm() {
         setName("");
@@ -159,8 +165,15 @@ export default function Team() {
             resetForm();
             fetchData(lastQuery.current);
             setOpenAdd(false);
+
+            setToastMessage("Team added successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to create data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
@@ -194,8 +207,15 @@ export default function Team() {
             resetForm();
             fetchData(lastQuery.current);
             setOpenEdit(false);
+
+            setToastMessage("Team updated successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to update data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
@@ -212,116 +232,134 @@ export default function Team() {
 
             fetchData(lastQuery.current);
             setOpenDelete(false);
+
+            setToastMessage("Team deleted successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to delete data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
     }, [id, fetchData]);
 
     return (
-        <MainLayoutAdmin>
-            <div className="flex justify-between items-center mb-10">
-                <h1 className="text-2xl font-semibold">Team</h1>
-                <Button
-                    className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1"
-                    onClick={() => setOpenAdd(true)}
+        <>
+            {
+                showToast && (
+                    <Toast
+                        type={toastType}
+                        message={toastMessage}
+                        onClose={() => setShowToast(false)}
+                    />
+                )
+            }
+            <MainLayoutAdmin>
+                <div className="flex justify-between items-center mb-10">
+                    <h1 className="text-2xl font-semibold">Team</h1>
+                    <Button
+                        className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1"
+                        onClick={() => setOpenAdd(true)}
+                    >
+                        <CirclePlus size={16} />
+                        Add Team
+                    </Button>
+                </div>
+
+                <DataTable
+                    columns={columns}
+                    data={rows}
+                    meta={meta}
+                    loading={loading}
+                    onQueryChange={fetchData}
+                    getRowId={(row) => row.id}
+                    onEdit={(row) => fetchOneData(row.id as number)}
+                    onDelete={(row) => {
+                        setId(row.id as number);
+                        setOpenDelete(true);
+                    }}
+                />
+
+                {/* Modal Add */}
+                <Modal
+                    isOpen={openAdd}
+                    onClose={() => { setOpenAdd(false); resetForm(); }}
+                    title="Add Team"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => { setOpenAdd(false); resetForm(); }} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
+                                Add Team
+                            </Button>
+                        </>
+                    }
                 >
-                    <CirclePlus size={16} />
-                    Add Team
-                </Button>
-            </div>
+                    <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
+                    <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
+                    <Input label="LinkedIn Link" type="text" className="bg-white mb-4" value={linkedin} onChange={setLinkedin} disabled={loading} />
+                    <Textarea label="Description" className="bg-white mb-4" value={description} onChange={setDescription} disabled={loading} />
+                    <ImageInput label="Photo" onChange={setPhoto} disabled={loading} />
+                </Modal>
 
-            <DataTable
-                columns={columns}
-                data={rows}
-                meta={meta}
-                loading={loading}
-                onQueryChange={fetchData}
-                getRowId={(row) => row.id}
-                onEdit={(row) => fetchOneData(row.id as number)}
-                onDelete={(row) => {
-                    setId(row.id as number);
-                    setOpenDelete(true);
-                }}
-            />
+                {/* Modal Edit */}
+                <Modal
+                    isOpen={openEdit}
+                    onClose={() => { setOpenEdit(false); resetForm(); }}
+                    title="Edit Team"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => { setOpenEdit(false); resetForm(); }} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
+                                Update Team
+                            </Button>
+                        </>
+                    }
+                >
+                    <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
+                    <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
+                    <Input label="LinkedIn Link" type="text" className="bg-white mb-4" value={linkedin} onChange={setLinkedin} disabled={loading} />
+                    <Textarea label="Description" className="bg-white mb-4" value={description} onChange={setDescription} disabled={loading} />
 
-            {/* Modal Add */}
-            <Modal
-                isOpen={openAdd}
-                onClose={() => { setOpenAdd(false); resetForm(); }}
-                title="Add Team"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => { setOpenAdd(false); resetForm(); }} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
-                            Add Team
-                        </Button>
-                    </>
-                }
-            >
-                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
-                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
-                <Input label="LinkedIn Link" type="text" className="bg-white mb-4" value={linkedin} onChange={setLinkedin} disabled={loading} />
-                <Textarea label="Description" className="bg-white mb-4" value={description} onChange={setDescription} disabled={loading} />
-                <ImageInput label="Photo" onChange={setPhoto} disabled={loading} />
-            </Modal>
+                    {/* Tampilkan foto lama kalau belum diganti */}
+                    {existingPhoto && !photo && (
+                        <div className="mb-2">
+                            <p className="text-sm font-medium mb-1">Current Photo</p>
+                            <img
+                                src={existingPhoto}
+                                alt="current"
+                                className="w-20 h-20 object-cover rounded-lg border"
+                            />
+                        </div>
+                    )}
+                    <ImageInput label="Change Photo (optional)" onChange={setPhoto} disabled={loading} />
+                </Modal>
 
-            {/* Modal Edit */}
-            <Modal
-                isOpen={openEdit}
-                onClose={() => { setOpenEdit(false); resetForm(); }}
-                title="Edit Team"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => { setOpenEdit(false); resetForm(); }} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
-                            Update Team
-                        </Button>
-                    </>
-                }
-            >
-                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
-                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
-                <Input label="LinkedIn Link" type="text" className="bg-white mb-4" value={linkedin} onChange={setLinkedin} disabled={loading} />
-                <Textarea label="Description" className="bg-white mb-4" value={description} onChange={setDescription} disabled={loading} />
-
-                {/* Tampilkan foto lama kalau belum diganti */}
-                {existingPhoto && !photo && (
-                    <div className="mb-2">
-                        <p className="text-sm font-medium mb-1">Current Photo</p>
-                        <img
-                            src={existingPhoto}
-                            alt="current"
-                            className="w-20 h-20 object-cover rounded-lg border"
-                        />
-                    </div>
-                )}
-                <ImageInput label="Change Photo (optional)" onChange={setPhoto} disabled={loading} />
-            </Modal>
-
-            {/* Modal Delete */}
-            <Modal
-                isOpen={openDelete}
-                onClose={() => setOpenDelete(false)}
-                title="Delete Team"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
-                            Delete Team
-                        </Button>
-                    </>
-                }
-            >
-                <p>Are you sure you want to delete this team?</p>
-            </Modal>
-        </MainLayoutAdmin>
+                {/* Modal Delete */}
+                <Modal
+                    isOpen={openDelete}
+                    onClose={() => setOpenDelete(false)}
+                    title="Delete Team"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
+                                Delete Team
+                            </Button>
+                        </>
+                    }
+                >
+                    <p>Are you sure you want to delete this team?</p>
+                </Modal>
+            </MainLayoutAdmin>
+        </>
     );
 }

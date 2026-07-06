@@ -9,6 +9,7 @@ import Input from "@/components/input";
 import Textarea from "@/components/textarea";
 import DataTable, { Column, DataTableQuery } from "@/components/datatable";
 import { initialMeta, type PaginationMeta } from "@/lib/pagination";
+import Toast from "@/components/toast";
 
 type TestimonialRow = {
     id: number;
@@ -48,6 +49,11 @@ export default function Testimonial() {
     const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
     const [loading, setLoading] = useState<boolean>(false);
     const lastQuery = useRef<DataTableQuery>({ page: 1, limit: 10, search: "" });
+
+    // Toast states
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState<"success" | "error">("error");
 
     //get data
     const fetchData = useCallback(async (query: DataTableQuery) => {
@@ -146,8 +152,15 @@ export default function Testimonial() {
             fetchData(lastQuery.current);
 
             setOpenAdd(false);
+
+            setToastMessage("Testimony added successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to add testimony");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
@@ -187,8 +200,15 @@ export default function Testimonial() {
             fetchData(lastQuery.current);
 
             setOpenEdit(false);
+
+            setToastMessage("Testimony updated successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to update testimony");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
@@ -213,99 +233,117 @@ export default function Testimonial() {
             fetchData(lastQuery.current);
 
             setOpenDelete(false);
+
+            setToastMessage("Testimony deleted successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to delete testimony");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
     }, [id, fetchData]);
 
     return (
-        <MainLayoutAdmin>
-            <div className="flex justify-between items-center mb-10">
-                <h1 className="text-2xl font-semibold">Testimonial</h1>
-                <Button className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1" onClick={() => setOpenAdd(true)}>
-                    <CirclePlus size={16} />
-                    Add Testimony
-                </Button>
-            </div>
+        <>
+            {
+                showToast && (
+                    <Toast
+                        type={toastType}
+                        message={toastMessage}
+                        onClose={() => setShowToast(false)}
+                    />
+                )
+            }
+            <MainLayoutAdmin>
+                <div className="flex justify-between items-center mb-10">
+                    <h1 className="text-2xl font-semibold">Testimonial</h1>
+                    <Button className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1" onClick={() => setOpenAdd(true)}>
+                        <CirclePlus size={16} />
+                        Add Testimony
+                    </Button>
+                </div>
 
-            <DataTable
-                columns={columns}
-                data={rows}
-                meta={meta}
-                loading={loading}
-                onQueryChange={fetchData}
-                getRowId={(row) => row.id}
-                onEdit={(row) => fetchOneData(row.id)}
-                onDelete={(row) => {
-                    setId(row.id);
-                    setOpenDelete(true);
-                }}
-            />
+                <DataTable
+                    columns={columns}
+                    data={rows}
+                    meta={meta}
+                    loading={loading}
+                    onQueryChange={fetchData}
+                    getRowId={(row) => row.id}
+                    onEdit={(row) => fetchOneData(row.id)}
+                    onDelete={(row) => {
+                        setId(row.id);
+                        setOpenDelete(true);
+                    }}
+                />
 
-            {/* Modal Add */}
-            <Modal
-                isOpen={openAdd}
-                onClose={() => setOpenAdd(false)}
-                title="Add Testimony"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
-                            Add Testimony
-                        </Button>
-                    </>
-                }
-            >
-                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
-                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
-                <Input label="Company" type="text" className="bg-white mb-4" value={company} onChange={setCompany} disabled={loading} />
-                <Textarea label="Testimony" className="bg-white" value={testimony} onChange={setTestimony} disabled={loading} />
-            </Modal>
+                {/* Modal Add */}
+                <Modal
+                    isOpen={openAdd}
+                    onClose={() => setOpenAdd(false)}
+                    title="Add Testimony"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
+                                Add Testimony
+                            </Button>
+                        </>
+                    }
+                >
+                    <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
+                    <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
+                    <Input label="Company" type="text" className="bg-white mb-4" value={company} onChange={setCompany} disabled={loading} />
+                    <Textarea label="Testimony" className="bg-white" value={testimony} onChange={setTestimony} disabled={loading} />
+                </Modal>
 
-            {/* Modal Edit */}
-            <Modal
-                isOpen={openEdit}
-                onClose={() => setOpenEdit(false)}
-                title="Edit Testimony"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
-                            Update Testimony
-                        </Button>
-                    </>
-                }
-            >
-                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
-                <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
-                <Input label="Company" type="text" className="bg-white mb-4" value={company} onChange={setCompany} disabled={loading} />
-                <Textarea label="Testimony" className="bg-white" value={testimony} onChange={setTestimony} disabled={loading} />
-            </Modal>
+                {/* Modal Edit */}
+                <Modal
+                    isOpen={openEdit}
+                    onClose={() => setOpenEdit(false)}
+                    title="Edit Testimony"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
+                                Update Testimony
+                            </Button>
+                        </>
+                    }
+                >
+                    <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={loading} />
+                    <Input label="Position" type="text" className="bg-white mb-4" value={position} onChange={setPosition} disabled={loading} />
+                    <Input label="Company" type="text" className="bg-white mb-4" value={company} onChange={setCompany} disabled={loading} />
+                    <Textarea label="Testimony" className="bg-white" value={testimony} onChange={setTestimony} disabled={loading} />
+                </Modal>
 
-            {/* Modal Delete */}
-            <Modal
-                isOpen={openDelete}
-                onClose={() => setOpenDelete(false)}
-                title="Delete Working Process"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
-                            Delete Testimony
-                        </Button>
-                    </>
-                }
-            >
-                <p>Are you sure you want to delete this tetimonial?</p>
-            </Modal>
-        </MainLayoutAdmin>
+                {/* Modal Delete */}
+                <Modal
+                    isOpen={openDelete}
+                    onClose={() => setOpenDelete(false)}
+                    title="Delete Working Process"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
+                                Delete Testimony
+                            </Button>
+                        </>
+                    }
+                >
+                    <p>Are you sure you want to delete this tetimonial?</p>
+                </Modal>
+            </MainLayoutAdmin>
+        </>
     )
 }

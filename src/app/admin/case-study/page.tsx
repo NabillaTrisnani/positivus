@@ -8,6 +8,7 @@ import { CirclePlus } from "lucide-react";
 import Textarea from "@/components/textarea";
 import DataTable, { Column, DataTableQuery } from "@/components/datatable";
 import { initialMeta, type PaginationMeta } from "@/lib/pagination";
+import Toast from "@/components/toast";
 
 type CaseStudyRow = {
     id: number;
@@ -35,6 +36,11 @@ export default function CaseStudy() {
     const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
     const [loading, setLoading] = useState<boolean>(false);
     const lastQuery = useRef<DataTableQuery>({ page: 1, limit: 10, search: "" });
+
+    // Toast states
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState<"success" | "error">("error");
 
     //get data
     const fetchData = useCallback(async (query: DataTableQuery) => {
@@ -121,8 +127,15 @@ export default function CaseStudy() {
             fetchData(lastQuery.current);
 
             setOpenAdd(false);
+
+            setToastMessage("Case study added successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to create data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
@@ -156,8 +169,15 @@ export default function CaseStudy() {
             fetchData(lastQuery.current);
 
             setOpenEdit(false);
+
+            setToastMessage("Case study updated successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to update data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
@@ -182,93 +202,111 @@ export default function CaseStudy() {
             fetchData(lastQuery.current);
 
             setOpenDelete(false);
+
+            setToastMessage("Case study deleted successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to delete data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
     }, [id, fetchData]);
 
     return (
-        <MainLayoutAdmin>
-            <div className="flex justify-between items-center mb-10">
-                <h1 className="text-2xl font-semibold">Case Study</h1>
-                <Button className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1" onClick={() => setOpenAdd(true)}>
-                    <CirclePlus size={16} />
-                    Add Case Study
-                </Button>
-            </div>
+        <>
+            {
+                showToast && (
+                    <Toast
+                        type={toastType}
+                        message={toastMessage}
+                        onClose={() => setShowToast(false)}
+                    />
+                )
+            }
+            <MainLayoutAdmin>
+                <div className="flex justify-between items-center mb-10">
+                    <h1 className="text-2xl font-semibold">Case Study</h1>
+                    <Button className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1" onClick={() => setOpenAdd(true)}>
+                        <CirclePlus size={16} />
+                        Add Case Study
+                    </Button>
+                </div>
 
-            <DataTable
-                columns={columns}
-                data={rows}
-                meta={meta}
-                loading={loading}
-                onQueryChange={fetchData}
-                getRowId={(row) => row.id}
-                onEdit={(row) => fetchOneData(row.id)}
-                onDelete={(row) => {
-                    setId(row.id);
-                    setOpenDelete(true);
-                }}
-            />
+                <DataTable
+                    columns={columns}
+                    data={rows}
+                    meta={meta}
+                    loading={loading}
+                    onQueryChange={fetchData}
+                    getRowId={(row) => row.id}
+                    onEdit={(row) => fetchOneData(row.id)}
+                    onDelete={(row) => {
+                        setId(row.id);
+                        setOpenDelete(true);
+                    }}
+                />
 
-            {/* Modal Add */}
-            <Modal
-                isOpen={openAdd}
-                onClose={() => setOpenAdd(false)}
-                title="Add Case Study"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
-                            Add Case
-                        </Button>
-                    </>
-                }
-            >
-                <Textarea label="Text" className="bg-white" value={text} onChange={setText} disabled={loading} />
-            </Modal>
+                {/* Modal Add */}
+                <Modal
+                    isOpen={openAdd}
+                    onClose={() => setOpenAdd(false)}
+                    title="Add Case Study"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
+                                Add Case
+                            </Button>
+                        </>
+                    }
+                >
+                    <Textarea label="Text" className="bg-white" value={text} onChange={setText} disabled={loading} />
+                </Modal>
 
-            {/* Modal Edit */}
-            <Modal
-                isOpen={openEdit}
-                onClose={() => setOpenEdit(false)}
-                title="Edit Case Study"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
-                            Update Case
-                        </Button>
-                    </>
-                }
-            >
-                <Textarea label="text" className="bg-white" value={text} onChange={setText} disabled={loading} />
-            </Modal>
+                {/* Modal Edit */}
+                <Modal
+                    isOpen={openEdit}
+                    onClose={() => setOpenEdit(false)}
+                    title="Edit Case Study"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
+                                Update Case
+                            </Button>
+                        </>
+                    }
+                >
+                    <Textarea label="text" className="bg-white" value={text} onChange={setText} disabled={loading} />
+                </Modal>
 
-            {/* Modal Delete */}
-            <Modal
-                isOpen={openDelete}
-                onClose={() => setOpenDelete(false)}
-                title="Delete Case Study"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
-                            Delete Case
-                        </Button>
-                    </>
-                }
-            >
-                <p>Are you sure you want to delete this case?</p>
-            </Modal>
-        </MainLayoutAdmin>
+                {/* Modal Delete */}
+                <Modal
+                    isOpen={openDelete}
+                    onClose={() => setOpenDelete(false)}
+                    title="Delete Case Study"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
+                                Delete Case
+                            </Button>
+                        </>
+                    }
+                >
+                    <p>Are you sure you want to delete this case?</p>
+                </Modal>
+            </MainLayoutAdmin>
+        </>
     )
 }

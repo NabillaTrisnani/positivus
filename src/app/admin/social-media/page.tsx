@@ -8,6 +8,7 @@ import { CirclePlus } from "lucide-react";
 import Input from "@/components/input";
 import DataTable, { Column, DataTableQuery } from "@/components/datatable";
 import { initialMeta, type PaginationMeta } from "@/lib/pagination";
+import Toast from "@/components/toast";
 
 type SocialMediaRow = {
     id: number;
@@ -39,6 +40,11 @@ export default function SocialMedia() {
     const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
     const [loading, setLoading] = useState<boolean>(false);
     const lastQuery = useRef<DataTableQuery>({ page: 1, limit: 10, search: "" });
+
+    // Toast states
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState<"success" | "error">("error");
 
     //get data
     const fetchData = useCallback(async (query: DataTableQuery) => {
@@ -129,8 +135,15 @@ export default function SocialMedia() {
             fetchData(lastQuery.current);
 
             setOpenAdd(false);
+
+            setToastMessage("Social media added successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to create data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
@@ -166,8 +179,15 @@ export default function SocialMedia() {
             fetchData(lastQuery.current);
 
             setOpenEdit(false);
+
+            setToastMessage("Social media updated successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to update data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
@@ -192,95 +212,113 @@ export default function SocialMedia() {
             fetchData(lastQuery.current);
 
             setOpenDelete(false);
+
+            setToastMessage("Social media deleted successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to delete data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
     }, [id, fetchData]);
 
     return (
-        <MainLayoutAdmin>
-            <div className="flex justify-between items-center mb-10">
-                <h1 className="text-2xl font-semibold">Social Media</h1>
-                <Button className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1" onClick={() => setOpenAdd(true)}>
-                    <CirclePlus size={16} />
-                    Add Social Media
-                </Button>
-            </div>
+        <>
+            {
+                showToast && (
+                    <Toast
+                        type={toastType}
+                        message={toastMessage}
+                        onClose={() => setShowToast(false)}
+                    />
+                )
+            }
+            <MainLayoutAdmin>
+                <div className="flex justify-between items-center mb-10">
+                    <h1 className="text-2xl font-semibold">Social Media</h1>
+                    <Button className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1" onClick={() => setOpenAdd(true)}>
+                        <CirclePlus size={16} />
+                        Add Social Media
+                    </Button>
+                </div>
 
-            <DataTable
-                columns={columns}
-                data={rows}
-                meta={meta}
-                loading={loading}
-                onQueryChange={fetchData}
-                getRowId={(row) => row.id}
-                onEdit={(row) => fetchOneData(row.id)}
-                onDelete={(row) => {
-                    setId(row.id);
-                    setOpenDelete(true);
-                }}
-            />
+                <DataTable
+                    columns={columns}
+                    data={rows}
+                    meta={meta}
+                    loading={loading}
+                    onQueryChange={fetchData}
+                    getRowId={(row) => row.id}
+                    onEdit={(row) => fetchOneData(row.id)}
+                    onDelete={(row) => {
+                        setId(row.id);
+                        setOpenDelete(true);
+                    }}
+                />
 
-            {/* Modal Add */}
-            <Modal
-                isOpen={openAdd}
-                onClose={() => setOpenAdd(false)}
-                title="Add Social Media"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
-                            Add Social Media
-                        </Button>
-                    </>
-                }
-            >
-                <Input label="Link" type="text" className="bg-white mb-4" value={link} onChange={setLink} disabled={loading} />
-                <Input label="Platform" type="text" className="bg-white mb-4" value={platform} onChange={setPlatform} disabled={loading} />
-            </Modal>
+                {/* Modal Add */}
+                <Modal
+                    isOpen={openAdd}
+                    onClose={() => setOpenAdd(false)}
+                    title="Add Social Media"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenAdd(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
+                                Add Social Media
+                            </Button>
+                        </>
+                    }
+                >
+                    <Input label="Link" type="text" className="bg-white mb-4" value={link} onChange={setLink} disabled={loading} />
+                    <Input label="Platform" type="text" className="bg-white mb-4" value={platform} onChange={setPlatform} disabled={loading} />
+                </Modal>
 
-            {/* Modal Edit */}
-            <Modal
-                isOpen={openEdit}
-                onClose={() => setOpenEdit(false)}
-                title="Edit Social Media"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
-                            Update Social Media
-                        </Button>
-                    </>
-                }
-            >
-                <Input label="Link" type="text" className="bg-white mb-4" value={link} onChange={setLink} disabled={loading} />
-                <Input label="Platform" type="text" className="bg-white mb-4" value={platform} onChange={setPlatform} disabled={loading} />
-            </Modal>
+                {/* Modal Edit */}
+                <Modal
+                    isOpen={openEdit}
+                    onClose={() => setOpenEdit(false)}
+                    title="Edit Social Media"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenEdit(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
+                                Update Social Media
+                            </Button>
+                        </>
+                    }
+                >
+                    <Input label="Link" type="text" className="bg-white mb-4" value={link} onChange={setLink} disabled={loading} />
+                    <Input label="Platform" type="text" className="bg-white mb-4" value={platform} onChange={setPlatform} disabled={loading} />
+                </Modal>
 
-            {/* Modal Delete */}
-            <Modal
-                isOpen={openDelete}
-                onClose={() => setOpenDelete(false)}
-                title="Delete Social Media"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
-                            Delete Social Media
-                        </Button>
-                    </>
-                }
-            >
-                <p>Are you sure you want to delete this social media link?</p>
-            </Modal>
-        </MainLayoutAdmin>
+                {/* Modal Delete */}
+                <Modal
+                    isOpen={openDelete}
+                    onClose={() => setOpenDelete(false)}
+                    title="Delete Social Media"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
+                                Delete Social Media
+                            </Button>
+                        </>
+                    }
+                >
+                    <p>Are you sure you want to delete this social media link?</p>
+                </Modal>
+            </MainLayoutAdmin>
+        </>
     )
 }

@@ -9,6 +9,7 @@ import { initialMeta, type PaginationMeta } from "@/lib/pagination";
 import Input from "@/components/input";
 import Textarea from "@/components/textarea";
 import Radio from "@/components/radio";
+import Toast from "@/components/toast";
 
 type ContantRow = {
     id: number;
@@ -52,6 +53,11 @@ export default function Contact() {
     const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
     const [loading, setLoading] = useState<boolean>(false);
     const lastQuery = useRef<DataTableQuery>({ page: 1, limit: 10, search: "" });
+
+    // Toast states
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState<"success" | "error">("error");
 
     //get data
     const fetchData = useCallback(async (query: DataTableQuery) => {
@@ -137,72 +143,90 @@ export default function Contact() {
             fetchData(lastQuery.current);
 
             setOpenDelete(false);
+
+            setToastMessage("Contact deleted successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to delete data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
     }, [id, fetchData]);
 
     return (
-        <MainLayoutAdmin>
-            <div className="flex justify-between items-center mb-10">
-                <h1 className="text-2xl font-semibold">Contact</h1>
-            </div>
-
-            <DataTable
-                columns={columns}
-                data={rows}
-                meta={meta}
-                loading={loading}
-                onQueryChange={fetchData}
-                getRowId={(row) => row.id}
-                onPreview={(row) => fetchOneData(row.id)}
-                onDelete={(row) => {
-                    setId(row.id);
-                    setOpenDelete(true);
-                }}
-            />
-
-            {/* Modal Preview */}
-            <Modal
-                isOpen={openPreview}
-                onClose={() => setOpenPreview(false)}
-                title="Preview Message"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenPreview(false)}>
-                            Close
-                        </Button>
-                    </>
-                }
-            >
-                <div className="mb-4">
-                    <Radio label="Type" options={typesOptions} value={type} onChange={setType} disabled={true} />
+        <>
+            {
+                showToast && (
+                    <Toast
+                        type={toastType}
+                        message={toastMessage}
+                        onClose={() => setShowToast(false)}
+                    />
+                )
+            }
+            <MainLayoutAdmin>
+                <div className="flex justify-between items-center mb-10">
+                    <h1 className="text-2xl font-semibold">Contact</h1>
                 </div>
-                <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={true} />
-                <Input label="Email" type="text" className="bg-white mb-4" value={email} onChange={setEmail} disabled={true} />
-                <Textarea label="Message" className="bg-white" value={message} onChange={setMessage} disabled={true} />
-            </Modal>
 
-            {/* Modal Delete */}
-            <Modal
-                isOpen={openDelete}
-                onClose={() => setOpenDelete(false)}
-                title="Delete Message"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
-                            Delete Message
-                        </Button>
-                    </>
-                }
-            >
-                <p>Are you sure you want to delete this message?</p>
-            </Modal>
-        </MainLayoutAdmin>
+                <DataTable
+                    columns={columns}
+                    data={rows}
+                    meta={meta}
+                    loading={loading}
+                    onQueryChange={fetchData}
+                    getRowId={(row) => row.id}
+                    onPreview={(row) => fetchOneData(row.id)}
+                    onDelete={(row) => {
+                        setId(row.id);
+                        setOpenDelete(true);
+                    }}
+                />
+
+                {/* Modal Preview */}
+                <Modal
+                    isOpen={openPreview}
+                    onClose={() => setOpenPreview(false)}
+                    title="Preview Message"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenPreview(false)}>
+                                Close
+                            </Button>
+                        </>
+                    }
+                >
+                    <div className="mb-4">
+                        <Radio label="Type" options={typesOptions} value={type} onChange={setType} disabled={true} />
+                    </div>
+                    <Input label="Name" type="text" className="bg-white mb-4" value={name} onChange={setName} disabled={true} />
+                    <Input label="Email" type="text" className="bg-white mb-4" value={email} onChange={setEmail} disabled={true} />
+                    <Textarea label="Message" className="bg-white" value={message} onChange={setMessage} disabled={true} />
+                </Modal>
+
+                {/* Modal Delete */}
+                <Modal
+                    isOpen={openDelete}
+                    onClose={() => setOpenDelete(false)}
+                    title="Delete Message"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
+                                Delete Message
+                            </Button>
+                        </>
+                    }
+                >
+                    <p>Are you sure you want to delete this message?</p>
+                </Modal>
+            </MainLayoutAdmin>
+        </>
     )
 }

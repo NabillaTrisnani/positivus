@@ -6,6 +6,7 @@ import MainLayoutAdmin from "@/components/mainLayoutAdmin";
 import Modal from "@/components/modal";
 import DataTable, { Column, DataTableQuery } from "@/components/datatable";
 import { initialMeta, type PaginationMeta } from "@/lib/pagination";
+import Toast from "@/components/toast";
 
 type SubscriptionRow = {
     id: number;
@@ -30,6 +31,11 @@ export default function Contact() {
     const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
     const [loading, setLoading] = useState<boolean>(false);
     const lastQuery = useRef<DataTableQuery>({ page: 1, limit: 10, search: "" });
+
+    // Toast states
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState<"success" | "error">("error");
 
     //get data
     const fetchData = useCallback(async (query: DataTableQuery) => {
@@ -84,50 +90,69 @@ export default function Contact() {
             fetchData(lastQuery.current);
 
             setOpenDelete(false);
+
+            setToastMessage("Subscription deleted successfully");
+            setToastType("success");
+            setShowToast(true);
+
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to delete data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
     }, [id, fetchData]);
 
     return (
-        <MainLayoutAdmin>
-            <div className="flex justify-between items-center mb-10">
-                <h1 className="text-2xl font-semibold">Subscription</h1>
-            </div>
+        <>
+            {
+                showToast && (
+                    <Toast
+                        type={toastType}
+                        message={toastMessage}
+                        onClose={() => setShowToast(false)}
+                    />
+                )
+            }
+            <MainLayoutAdmin>
+                <div className="flex justify-between items-center mb-10">
+                    <h1 className="text-2xl font-semibold">Subscription</h1>
+                </div>
 
-            <DataTable
-                columns={columns}
-                data={rows}
-                meta={meta}
-                loading={loading}
-                onQueryChange={fetchData}
-                getRowId={(row) => row.id}
-                onDelete={(row) => {
-                    setId(row.id);
-                    setOpenDelete(true);
-                }}
-            />
+                <DataTable
+                    columns={columns}
+                    data={rows}
+                    meta={meta}
+                    loading={loading}
+                    onQueryChange={fetchData}
+                    getRowId={(row) => row.id}
+                    onDelete={(row) => {
+                        setId(row.id);
+                        setOpenDelete(true);
+                    }}
+                />
 
-            {/* Modal Delete */}
-            <Modal
-                isOpen={openDelete}
-                onClose={() => setOpenDelete(false)}
-                title="Delete Message"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
-                            Delete Subscription
-                        </Button>
-                    </>
-                }
-            >
-                <p>Are you sure you want to delete this subscription?</p>
-            </Modal>
-        </MainLayoutAdmin>
+                {/* Modal Delete */}
+                <Modal
+                    isOpen={openDelete}
+                    onClose={() => setOpenDelete(false)}
+                    title="Delete Message"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
+                                Delete Subscription
+                            </Button>
+                        </>
+                    }
+                >
+                    <p>Are you sure you want to delete this subscription?</p>
+                </Modal>
+            </MainLayoutAdmin>
+        </>
     )
 }

@@ -10,6 +10,7 @@ import ImageInput from "@/components/imageInput";
 import DataTable, { Column, DataTableQuery } from "@/components/datatable";
 import { initialMeta, type PaginationMeta } from "@/lib/pagination";
 import ColorInput from "@/components/colorInput";
+import Toast from "@/components/toast";
 
 
 type ServiceRow = {
@@ -43,13 +44,16 @@ export default function Service() {
     const [serviceIllustration, setServiceIllustration] = useState<File | null>(null);
     const [existingServiceIllustration, setExistingServiceIllustration] = useState<string>("");
 
-
-
     // DataTable states
     const [rows, setRows] = useState<ServiceRowDisplay[]>([]);
     const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
     const [loading, setLoading] = useState<boolean>(false);
     const lastQuery = useRef<DataTableQuery>({ page: 1, limit: 10, search: "" });
+
+    // Toast states
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState<"success" | "error">("error");
 
     function resetForm() {
         setCardBackground("gray");
@@ -148,8 +152,15 @@ export default function Service() {
             resetForm();
             fetchData(lastQuery.current);
             setOpenAdd(false);
+
+            setToastMessage("Service added successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to create data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
@@ -185,8 +196,15 @@ export default function Service() {
             resetForm();
             fetchData(lastQuery.current);
             setOpenEdit(false);
+
+            setToastMessage("Service updated successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to update data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
@@ -203,211 +221,229 @@ export default function Service() {
 
             fetchData(lastQuery.current);
             setOpenDelete(false);
+
+            setToastMessage("Service deleted successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error(error);
+            setToastMessage("Failed to delete data");
+            setToastType("error");
+            setShowToast(true);
         } finally {
             setLoading(false);
         }
     }, [id, fetchData]);
 
     return (
-        <MainLayoutAdmin>
-            <div className="flex justify-between items-center mb-10">
-                <h1 className="text-2xl font-semibold">Service</h1>
-                <Button
-                    className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1"
-                    onClick={() => setOpenAdd(true)}
+        <>
+            {
+                showToast && (
+                    <Toast
+                        type={toastType}
+                        message={toastMessage}
+                        onClose={() => setShowToast(false)}
+                    />
+                )
+            }
+            <MainLayoutAdmin>
+                <div className="flex justify-between items-center mb-10">
+                    <h1 className="text-2xl font-semibold">Service</h1>
+                    <Button
+                        className="bg-green hover:bg-green-hover border border-black px-5 py-2 flex items-center gap-1"
+                        onClick={() => setOpenAdd(true)}
+                    >
+                        <CirclePlus size={16} />
+                        Add Service
+                    </Button>
+                </div>
+
+                <DataTable
+                    columns={columns}
+                    data={rows}
+                    meta={meta}
+                    loading={loading}
+                    onQueryChange={fetchData}
+                    getRowId={(row) => row.id}
+                    onEdit={(row) => fetchOneData(row.id as number)}
+                    onDelete={(row) => {
+                        setId(row.id as number);
+                        setOpenDelete(true);
+                    }}
+                />
+
+                {/* Modal Add */}
+                <Modal
+                    isOpen={openAdd}
+                    onClose={() => { setOpenAdd(false); resetForm(); }}
+                    title="Add Service"
+                    fullScreen
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => { setOpenAdd(false); resetForm(); }} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
+                                Add Service
+                            </Button>
+                        </>
+                    }
                 >
-                    <CirclePlus size={16} />
-                    Add Service
-                </Button>
-            </div>
 
-            <DataTable
-                columns={columns}
-                data={rows}
-                meta={meta}
-                loading={loading}
-                onQueryChange={fetchData}
-                getRowId={(row) => row.id}
-                onEdit={(row) => fetchOneData(row.id as number)}
-                onDelete={(row) => {
-                    setId(row.id as number);
-                    setOpenDelete(true);
-                }}
-            />
-
-            {/* Modal Add */}
-            <Modal
-                isOpen={openAdd}
-                onClose={() => { setOpenAdd(false); resetForm(); }}
-                title="Add Service"
-                fullScreen
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => { setOpenAdd(false); resetForm(); }} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={addData} isLoading={loading}>
-                            Add Service
-                        </Button>
-                    </>
-                }
-            >
-
-                <div className="grid grid-cols-2 gap-6">
-                    <div>
-                        <section>
-                            <h4 className="text-xl font-semibold mb-2">Card</h4>
-                            <ColorInput label="Card Background Color" onChange={setCardBackground} value={cardBackground} />
-                        </section>
-                        <hr className="mb-4" />
-                        <section>
-                            <h4 className="text-xl font-semibold mb-2">Header</h4>
-                            <Input label="Header Text" type="text" className="bg-white mb-4" value={headerText} onChange={setHeaderText} disabled={loading} />
-                            <div className="grid grid-cols-2 gap-6">
-                                <ColorInput label="Header Font Color" onChange={setHeaderTextColor} value={headerTextColor} />
-                                <ColorInput label="Header Background Color" onChange={setHeaderBackgroundColor} value={headerBackgroundColor} />
-                            </div>
-                        </section>
-                        <hr className="mb-4" />
-                        <section>
-                            <h4 className="text-xl font-semibold mb-2">&quot;Learn More&quot; Button</h4>
-                            <div className="grid grid-cols-2 gap-6">
-                                <ColorInput label="Icon Color" onChange={setButtonIconColor} value={buttonIconColor} />
-                                <ColorInput label="Font Color" onChange={setButtonFontColor} value={buttonFontColor} />
-                            </div>
-                        </section>
-                        <hr className="mb-4" />
-                        <section>
-                            <h4 className="text-xl font-semibold mb-2">Illustration</h4>
-                            <ImageInput label="Illustration" onChange={setServiceIllustration} disabled={loading} />
-                        </section>
-                    </div>
-                    <div className="sticky top-0 self-start">
-                        <div className={`w-full border border-black bg-${cardBackground} rounded-[2.813rem] p-[3.125rem]`}>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="flex flex-col justify-between gap-[5.813rem]">
-                                    <p className={`text-3xl bg-${headerBackgroundColor} text-${headerTextColor} rounded-[0.438rem] p-[0.438rem] font-medium`}>{headerText}</p>
-                                    <button className={`flex items-center gap-4 text-xl text-${buttonFontColor}`}>
-                                        <span className={`w-[2.563rem] h-[2.563rem] rounded-full bg-${buttonFontColor} text-white flex items-center justify-center`}>
-                                            <ArrowUpRight className={`text-${buttonIconColor}`} />
-                                        </span>
-                                        Learn more
-                                    </button>
+                    <div className="grid grid-cols-2 gap-6">
+                        <div>
+                            <section>
+                                <h4 className="text-xl font-semibold mb-2">Card</h4>
+                                <ColorInput label="Card Background Color" onChange={setCardBackground} value={cardBackground} />
+                            </section>
+                            <hr className="mb-4" />
+                            <section>
+                                <h4 className="text-xl font-semibold mb-2">Header</h4>
+                                <Input label="Header Text" type="text" className="bg-white mb-4" value={headerText} onChange={setHeaderText} disabled={loading} />
+                                <div className="grid grid-cols-2 gap-6">
+                                    <ColorInput label="Header Font Color" onChange={setHeaderTextColor} value={headerTextColor} />
+                                    <ColorInput label="Header Background Color" onChange={setHeaderBackgroundColor} value={headerBackgroundColor} />
                                 </div>
-                                {serviceIllustration ? (
-                                    <img src={URL.createObjectURL(serviceIllustration)} className="my-auto w-[13.125rem] ml-auto" alt="" />
-                                ) : (
-                                    <img src="https://placehold.co/210x210" className="my-auto w-[13.125rem] ml-auto" alt="" />
-                                )}
+                            </section>
+                            <hr className="mb-4" />
+                            <section>
+                                <h4 className="text-xl font-semibold mb-2">&quot;Learn More&quot; Button</h4>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <ColorInput label="Icon Color" onChange={setButtonIconColor} value={buttonIconColor} />
+                                    <ColorInput label="Font Color" onChange={setButtonFontColor} value={buttonFontColor} />
+                                </div>
+                            </section>
+                            <hr className="mb-4" />
+                            <section>
+                                <h4 className="text-xl font-semibold mb-2">Illustration</h4>
+                                <ImageInput label="Illustration" onChange={setServiceIllustration} disabled={loading} />
+                            </section>
+                        </div>
+                        <div className="sticky top-0 self-start">
+                            <div className={`w-full border border-black bg-${cardBackground} rounded-[2.813rem] p-[3.125rem]`}>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col justify-between gap-[5.813rem]">
+                                        <p className={`text-3xl bg-${headerBackgroundColor} text-${headerTextColor} rounded-[0.438rem] p-[0.438rem] font-medium`}>{headerText}</p>
+                                        <button className={`flex items-center gap-4 text-xl text-${buttonFontColor}`}>
+                                            <span className={`w-[2.563rem] h-[2.563rem] rounded-full bg-${buttonFontColor} text-white flex items-center justify-center`}>
+                                                <ArrowUpRight className={`text-${buttonIconColor}`} />
+                                            </span>
+                                            Learn more
+                                        </button>
+                                    </div>
+                                    {serviceIllustration ? (
+                                        <img src={URL.createObjectURL(serviceIllustration)} className="my-auto w-[13.125rem] ml-auto" alt="" />
+                                    ) : (
+                                        <img src="https://placehold.co/210x210" className="my-auto w-[13.125rem] ml-auto" alt="" />
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </Modal>
+                </Modal>
 
-            {/* Modal Edit */}
-            <Modal
-                isOpen={openEdit}
-                onClose={() => { setOpenEdit(false); resetForm(); }}
-                title="Edit Service"
-                fullScreen
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => { setOpenEdit(false); resetForm(); }} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
-                            Update Service
-                        </Button>
-                    </>
-                }
-            >
-                <div className="grid grid-cols-2 gap-6">
-                    <div>
-                        <section>
-                            <h4 className="text-xl font-semibold mb-2">Card</h4>
-                            <ColorInput label="Card Background Color" onChange={setCardBackground} value={cardBackground} />
-                        </section>
-                        <hr className="mb-4" />
-                        <section>
-                            <h4 className="text-xl font-semibold mb-2">Header</h4>
-                            <Input label="Header Text" type="text" className="bg-white mb-4" value={headerText} onChange={setHeaderText} disabled={loading} />
-                            <div className="grid grid-cols-2 gap-6">
-                                <ColorInput label="Header Font Color" onChange={setHeaderTextColor} value={headerTextColor} />
-                                <ColorInput label="Header Background Color" onChange={setHeaderBackgroundColor} value={headerBackgroundColor} />
-                            </div>
-                        </section>
-                        <hr className="mb-4" />
-                        <section>
-                            <h4 className="text-xl font-semibold mb-2">&quot;Learn More&quot; Button</h4>
-                            <div className="grid grid-cols-2 gap-6">
-                                <ColorInput label="Icon Color" onChange={setButtonIconColor} value={buttonIconColor} />
-                                <ColorInput label="Font Color" onChange={setButtonFontColor} value={buttonFontColor} />
-                            </div>
-                        </section>
-                        <hr className="mb-4" />
-                        <section>
-                            <h4 className="text-xl font-semibold mb-2">Illustration</h4>
+                {/* Modal Edit */}
+                <Modal
+                    isOpen={openEdit}
+                    onClose={() => { setOpenEdit(false); resetForm(); }}
+                    title="Edit Service"
+                    fullScreen
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => { setOpenEdit(false); resetForm(); }} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={editData} isLoading={loading}>
+                                Update Service
+                            </Button>
+                        </>
+                    }
+                >
+                    <div className="grid grid-cols-2 gap-6">
+                        <div>
+                            <section>
+                                <h4 className="text-xl font-semibold mb-2">Card</h4>
+                                <ColorInput label="Card Background Color" onChange={setCardBackground} value={cardBackground} />
+                            </section>
+                            <hr className="mb-4" />
+                            <section>
+                                <h4 className="text-xl font-semibold mb-2">Header</h4>
+                                <Input label="Header Text" type="text" className="bg-white mb-4" value={headerText} onChange={setHeaderText} disabled={loading} />
+                                <div className="grid grid-cols-2 gap-6">
+                                    <ColorInput label="Header Font Color" onChange={setHeaderTextColor} value={headerTextColor} />
+                                    <ColorInput label="Header Background Color" onChange={setHeaderBackgroundColor} value={headerBackgroundColor} />
+                                </div>
+                            </section>
+                            <hr className="mb-4" />
+                            <section>
+                                <h4 className="text-xl font-semibold mb-2">&quot;Learn More&quot; Button</h4>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <ColorInput label="Icon Color" onChange={setButtonIconColor} value={buttonIconColor} />
+                                    <ColorInput label="Font Color" onChange={setButtonFontColor} value={buttonFontColor} />
+                                </div>
+                            </section>
+                            <hr className="mb-4" />
+                            <section>
+                                <h4 className="text-xl font-semibold mb-2">Illustration</h4>
 
-                            {/* Tampilkan foto lama kalau belum diganti */}
-                            {existingServiceIllustration && !serviceIllustration && (
-                                <div className="mb-2">
-                                    <p className="text-sm font-medium mb-1">Current Photo</p>
-                                    <img
-                                        src={existingServiceIllustration}
-                                        alt="current"
-                                        className="w-20 h-20 object-cover rounded-lg border"
-                                    />
-                                </div>
-                            )}
-                            <ImageInput label="Illustration" onChange={setServiceIllustration} disabled={loading} />
-                        </section>
-                    </div>
-                    <div className="sticky top-0 self-start">
-                        <div className={`w-full border border-black bg-${cardBackground} rounded-[2.813rem] p-[3.125rem]`}>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="flex flex-col justify-between gap-[5.813rem]">
-                                    <p className={`text-3xl bg-${headerBackgroundColor} text-${headerTextColor} rounded-[0.438rem] p-[0.438rem] font-medium`}>{headerText}</p>
-                                    <button className={`flex items-center gap-4 text-xl text-${buttonFontColor}`}>
-                                        <span className={`w-[2.563rem] h-[2.563rem] rounded-full bg-${buttonFontColor} text-white flex items-center justify-center`}>
-                                            <ArrowUpRight className={`text-${buttonIconColor}`} />
-                                        </span>
-                                        Learn more
-                                    </button>
-                                </div>
-                                {existingServiceIllustration && !serviceIllustration ? (
-                                    <img src={existingServiceIllustration} className="my-auto w-[13.125rem] ml-auto" alt="" />
-                                ) : serviceIllustration ? (
-                                    <img src={URL.createObjectURL(serviceIllustration)} className="my-auto w-[13.125rem] ml-auto" alt="" />
-                                ) : (
-                                    <img src="https://placehold.co/210x210" className="my-auto w-[13.125rem] ml-auto" alt="" />
+                                {/* Tampilkan foto lama kalau belum diganti */}
+                                {existingServiceIllustration && !serviceIllustration && (
+                                    <div className="mb-2">
+                                        <p className="text-sm font-medium mb-1">Current Photo</p>
+                                        <img
+                                            src={existingServiceIllustration}
+                                            alt="current"
+                                            className="w-20 h-20 object-cover rounded-lg border"
+                                        />
+                                    </div>
                                 )}
+                                <ImageInput label="Illustration" onChange={setServiceIllustration} disabled={loading} />
+                            </section>
+                        </div>
+                        <div className="sticky top-0 self-start">
+                            <div className={`w-full border border-black bg-${cardBackground} rounded-[2.813rem] p-[3.125rem]`}>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col justify-between gap-[5.813rem]">
+                                        <p className={`text-3xl bg-${headerBackgroundColor} text-${headerTextColor} rounded-[0.438rem] p-[0.438rem] font-medium`}>{headerText}</p>
+                                        <button className={`flex items-center gap-4 text-xl text-${buttonFontColor}`}>
+                                            <span className={`w-[2.563rem] h-[2.563rem] rounded-full bg-${buttonFontColor} text-white flex items-center justify-center`}>
+                                                <ArrowUpRight className={`text-${buttonIconColor}`} />
+                                            </span>
+                                            Learn more
+                                        </button>
+                                    </div>
+                                    {existingServiceIllustration && !serviceIllustration ? (
+                                        <img src={existingServiceIllustration} className="my-auto w-[13.125rem] ml-auto" alt="" />
+                                    ) : serviceIllustration ? (
+                                        <img src={URL.createObjectURL(serviceIllustration)} className="my-auto w-[13.125rem] ml-auto" alt="" />
+                                    ) : (
+                                        <img src="https://placehold.co/210x210" className="my-auto w-[13.125rem] ml-auto" alt="" />
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </Modal>
+                </Modal>
 
-            {/* Modal Delete */}
-            <Modal
-                isOpen={openDelete}
-                onClose={() => setOpenDelete(false)}
-                title="Delete Service"
-                footer={
-                    <>
-                        <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
-                            Cancel
-                        </Button>
-                        <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
-                            Delete Service
-                        </Button>
-                    </>
-                }
-            >
-                <p>Are you sure you want to delete this team?</p>
-            </Modal>
-        </MainLayoutAdmin>
+                {/* Modal Delete */}
+                <Modal
+                    isOpen={openDelete}
+                    onClose={() => setOpenDelete(false)}
+                    title="Delete Service"
+                    footer={
+                        <>
+                            <Button className="border border-black px-5 py-2" onClick={() => setOpenDelete(false)} disabled={loading}>
+                                Cancel
+                            </Button>
+                            <Button className="bg-green border border-black px-5 py-2" onClick={deleteData} isLoading={loading}>
+                                Delete Service
+                            </Button>
+                        </>
+                    }
+                >
+                    <p>Are you sure you want to delete this team?</p>
+                </Modal>
+            </MainLayoutAdmin>
+        </>
     );
 }
