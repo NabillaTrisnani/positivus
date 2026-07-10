@@ -1,0 +1,70 @@
+.wrapper {
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+}
+
+.fadeLeft,
+.fadeRight {
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 4rem;
+	z-index: 10;
+}
+
+.fadeLeft {
+	left: 0;
+	background: linear-gradient(to right, white, transparent);
+}
+
+.fadeRight {
+	right: 0;
+	background: linear-gradient(to left, white, transparent);
+}
+
+.track {
+	display: flex;
+	width: max-content;
+}
+.scrollLeft {
+	animation: scrollLeft 20s linear infinite;
+}
+.scrollRight {
+	animation: scrollRight 20s linear infinite;
+}
+
+.track:hover {
+	animation-play-state: paused;
+}
+
+.group {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	gap: 2rem;
+	padding-right: 2rem;
+}
+
+.item {
+	flex-shrink: 0;
+}
+
+@keyframes scrollLeft {
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
+}
+
+@keyframes scrollRight {
+	0% {
+		transform: translateX(-50%);
+	}
+	100% {
+		transform: translateX(0);
+	}
+}

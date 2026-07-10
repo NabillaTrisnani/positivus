@@ -5,7 +5,7 @@ export default function Hero() {
                 <h1 className="text-3xl lg:text-6xl font-semibold lg:font-medium">Navigating the digital landscape for success</h1>
                 <img src="/hero.svg" alt="Hero image" className="w-full object-cover block md:hidden" />
                 <p className="text-sm lg:text-xl">Our digital marketing agency helps businesses grow and succeed online through a range of services including SEO, PPC, social media marketing, and content creation.</p>
-                <a href="#contact" className="bg-black text-white hover:bg-green py-3 px-6 rounded-[14px] text-center w-fit">Book a consultation</a>
+                <a href="#contact" className="bg-black text-white hover:bg-green hover:text-black py-3 px-6 rounded-[14px] border border-black text-center w-fit">Book a consultation</a>
             </div>
             <div className="hidden md:block">
                 <img src="/hero.svg" alt="Hero image" className="w-full object-cover" />
