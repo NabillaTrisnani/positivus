@@ -203,7 +203,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [contactEmail]);
+  }, [subscribtionEmail]);
 
   useEffect(() => {
     const loadAll = async () => {
