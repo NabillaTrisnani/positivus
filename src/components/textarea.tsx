@@ -28,7 +28,6 @@ export default function Textarea({
                     rows={rows}
                     disabled={disabled}
                 >
-                    {value}
                 </textarea>
             }
         </div>

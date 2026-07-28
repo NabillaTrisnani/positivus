@@ -6,12 +6,14 @@ export default function Button({
     onClick = () => { },
     isLoading = false,
     disabled = false,
+    loadingColor = "",
 }: {
     className?: string;
     children?: React.ReactNode;
     onClick?: () => void;
     isLoading?: boolean;
     disabled?: boolean;
+    loadingColor?: string;
 }) {
     return (
         <button
@@ -20,7 +22,7 @@ export default function Button({
             disabled={disabled || isLoading}
         >
             {isLoading ? (
-                <Loader2 className="animate-spin text-black" size={24} />
+                <Loader2 className="animate-spin text-black mx-auto" color={loadingColor} size={24} />
             ) : children}
         </button>
     )

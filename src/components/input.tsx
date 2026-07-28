@@ -7,6 +7,7 @@ export default function Input({
     value = "",
     onChange = () => { },
     label = "",
+    placeholder = "",
     type = "text",
     isPassword = false,
     togglePassword = () => { },
@@ -17,6 +18,7 @@ export default function Input({
     value?: string;
     onChange?: (value: string) => void;
     label?: string;
+    placeholder?: string;
     type?: string;
     isPassword?: boolean;
     togglePassword?: () => void;
@@ -35,6 +37,7 @@ export default function Input({
                             type={type}
                             className={`border-l border-y border-solid border-black rounded-l-[14px] py-2 px-4 text-base outline-none ${className}`}
                             value={value}
+                            placeholder={placeholder}
                             onChange={(e) => onChange(e.target.value)}
                         />
                         <button
@@ -56,6 +59,7 @@ export default function Input({
                             type="search"
                             className={`border-r border-y border-solid border-black rounded-r-[14px] py-2 pr-4 text-base outline-none ${className}`}
                             value={value}
+                            placeholder={placeholder}
                             onChange={(e) => onChange(e.target.value)}
                         />
                     </div>
@@ -64,6 +68,7 @@ export default function Input({
                         type={type}
                         className={`border border-solid border-black rounded-[14px] py-2 px-4 text-base w-full outline-none ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${className}`}
                         value={value}
+                        placeholder={placeholder}
                         onChange={(e) => onChange(e.target.value)}
                         disabled={disabled}
                     />

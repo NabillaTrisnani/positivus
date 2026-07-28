@@ -5,7 +5,7 @@ export default function CallToAction() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-[1.625rem]">
                         <h3 className="text-3xl font-medium">Let’s make things happen</h3>
-                        <p className="text-lg">Contact us today to learn more about how our digital marketing services can help your business grow and succeed online.</p>
+                        <p className="text-base lg:text-lg">Contact us today to learn more about how our digital marketing services can help your business grow and succeed online.</p>
                         <a href="#contact" className="bg-black text-white hover:bg-green hover:text-black py-3 px-6 rounded-[14px] border border-black text-center w-fit">Get your free proposal</a>
                     </div>
                     <div className="hidden lg:block">

@@ -11,8 +11,8 @@ export default function Services({
             <div className="grid grid-cols-3 grid-rows-1">
                 <div className="col-span-3 lg:col-span-2">
                     <div className="flex items-center flex-col md:flex-row gap-8 lg:gap-10 mb-8 lg:mb-20">
-                        <h1 className="text-[40px] bg-green text-black rounded-[0.438rem] p-[0.438rem] font-medium">Services</h1>
-                        <p className="text-lg">At our digital marketing agency, we offer a range of services to help businesses grow and succeed online. These services include:</p>
+                        <h1 className="text-4xl md:text-[40px] text-center bg-green text-black rounded-[0.438rem] p-[0.438rem] font-medium shrink-0">Services</h1>
+                        <p className="text-lg text-center md:text-left">At our digital marketing agency, we offer a range of services to help businesses grow and succeed online. These services include:</p>
                     </div>
                 </div>
             </div>
